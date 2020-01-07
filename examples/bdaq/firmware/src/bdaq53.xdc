@@ -2,10 +2,20 @@
 create_clock -period 10.000 -name clkin -add [get_ports clkin]
 create_clock -period 8.000 -name rgmii_rxc -add [get_ports rgmii_rxc]
 
-set_false_path -from [get_clocks CLK125PLLTX] -to [get_clocks BUS_CLK_PLL]
-set_false_path -from [get_clocks BUS_CLK_PLL] -to [get_clocks CLK125PLLTX]
-set_false_path -from [get_clocks BUS_CLK_PLL] -to [get_clocks rgmii_rxc]
-set_false_path -from [get_clocks rgmii_rxc] -to [get_clocks BUS_CLK_PLL]
+# Exclude asynchronous clock domains from timing (handled by CDCs)
+set_clock_groups -asynchronous \
+-group [get_clocks -include_generated_clocks clkin] \
+-group [get_clocks -include_generated_clocks rgmii_rxc] \
+
+# false path between BUS_CLK_PLL and CLK125PLLTX
+set_false_path -from [get_clocks -of_objects [get_pins PLLE2_BASE_inst/CLKOUT0]] -to [get_clocks -of_objects [get_pins PLLE2_BASE_inst/CLKOUT2]]
+set_false_path -from [get_clocks -of_objects [get_pins PLLE2_BASE_inst/CLKOUT2]] -to [get_clocks -of_objects [get_pins PLLE2_BASE_inst/CLKOUT0]]
+
+# SiTCP
+set_max_delay -datapath_only -from [get_clocks CLK125PLLTX] -to [get_ports {rgmii_txd[*]}] 4
+set_max_delay -datapath_only -from [get_clocks CLK125PLLTX] -to [get_ports rgmii_tx_ctl] 4
+set_max_delay -datapath_only -from [get_clocks CLK125PLLTX90] -to [get_ports rgmii_txc] 4
+
 
 #NET "Clk100"
 set_property PACKAGE_PIN AA4 [get_ports clkin]

@@ -30,7 +30,7 @@ module bdaq53_eth_throughput_test(
 );
 
 wire RST;
-wire BUS_CLK_PLL, CLK250PLL, CLK125PLLTX, CLK125PLLTX90, CLK125PLLRX;
+wire BUS_CLK_PLL, CLK125PLLTX, CLK125PLLTX90;
 wire PLL_FEEDBACK, LOCKED;
 
 PLLE2_BASE #(
@@ -67,10 +67,10 @@ PLLE2_BASE #(
  PLLE2_BASE_inst (
 
      .CLKOUT0(BUS_CLK_PLL),
-     .CLKOUT1(CLK250PLL),
+     .CLKOUT1(),
      .CLKOUT2(CLK125PLLTX),
      .CLKOUT3(CLK125PLLTX90),
-     .CLKOUT4(CLK125PLLRX),
+     .CLKOUT4(),
      .CLKOUT5(),
 
      .CLKFBOUT(PLL_FEEDBACK),
@@ -240,7 +240,8 @@ WRAP_SiTCP_GMII_XC7K_32K sitcp(
 
 wire BUS_WR, BUS_RD, BUS_RST;
 wire [31:0] BUS_ADD;
-wire [31:0] BUS_DATA;
+wire [7:0] BUS_DATA;
+assign BUS_RST = SiTCP_RST;
 
 rbcp_to_bus irbcp_to_bus(
     .BUS_RST(BUS_RST),
@@ -291,11 +292,8 @@ bdaq53_eth_core i_bdaq53_eth_core(
     .BUS_DATA(BUS_DATA),
     .BUS_RD(BUS_RD),
     .BUS_WR(BUS_WR),
-    .BUS_BYTE_ACCESS(),
 
-    .fifo_empty(fifo_empty),
     .fifo_full(fifo_full),
-    .FIFO_NEXT(fifo_next),
     .FIFO_DATA(FIFO_DATA),
     .FIFO_WRITE(fifo_write),
 
@@ -306,7 +304,6 @@ bdaq53_eth_core i_bdaq53_eth_core(
 assign TCP_TX_WR = !TCP_TX_FULL && !fifo_empty;
 
 reg ETH_START_SENDING, ETH_START_SENDING_temp, ETH_START_SENDING_LOCK;
-reg [31:0] datasource;
 assign LED = ~{TCP_OPEN_ACK, TCP_CLOSE_REQ, TCP_RX_WR, TCP_TX_WR, fifo_full, fifo_empty, fifo_write, TCP_TX_WR};    //GPIO_IO[3:0]};
 
 
@@ -328,12 +325,6 @@ always @(posedge BUS_CLK)
     else begin
         TCP_RX_WC_11B <= 11'd0;
     end
-
-    // FIFO handshake
-    if(ETH_START_SENDING_LOCK)
-        fifo_next <= 1'b1;
-    else
-        fifo_next <= 1'b0;
 
     // stop, if connection is closed by host
     if(TCP_CLOSE_REQ || !GPIO[0]) begin

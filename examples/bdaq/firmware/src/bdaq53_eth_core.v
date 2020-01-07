@@ -15,14 +15,11 @@ module bdaq53_eth_core(
 
     input wire          BUS_RST,
     input wire  [31:0]  BUS_ADD,
-    inout wire  [31:0]  BUS_DATA,
+    inout wire  [7:0]   BUS_DATA,
     input wire          BUS_RD,
     input wire          BUS_WR,
-    output wire         BUS_BYTE_ACCESS,
 
-    input wire          fifo_empty,
     input wire          fifo_full,
-    input wire          FIFO_NEXT,
     output wire         FIFO_WRITE,
     output wire [31:0]  FIFO_DATA,
 
@@ -46,7 +43,7 @@ module bdaq53_eth_core(
         .BUS_CLK(BUS_CLK),
         .BUS_RST(BUS_RST),
         .BUS_ADD(BUS_ADD),
-        .BUS_DATA(BUS_DATA[7:0]),
+        .BUS_DATA(BUS_DATA),
         .BUS_RD(BUS_RD),
         .BUS_WR(BUS_WR),
         .IO(GPIO)
@@ -54,8 +51,6 @@ module bdaq53_eth_core(
     wire EN;
     assign EN = GPIO[0];
 
-    reg [31:0] datasource;
-    reg fifo_write;
     assign FIFO_WRITE = !fifo_full & EN;
     reg [31:0] fifo_data_out;
     assign FIFO_DATA = fifo_data_out;
