@@ -32,6 +32,7 @@ proc run_bit { part board connector xdc_file size option} {
 
     read_design_files
     read_xdc $xdc_file
+    read_xdc ../src/SiTCP.xdc
 
     global include_dirs
 
