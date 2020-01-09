@@ -284,7 +284,7 @@ bdaq53_eth_core i_bdaq53_eth_core(
     .RESET_N(RESET_N),
 
     // clocks from PLL
-    .BUS_CLK(BUS_CLK), .CLK125TX(CLK125TX), .CLK125TX90(CLK125TX90), .CLK125RX(CLK125RX),
+    .BUS_CLK(BUS_CLK),
     .PLL_LOCKED(LOCKED),
 
     .BUS_RST(BUS_RST),

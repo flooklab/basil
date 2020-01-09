@@ -6,11 +6,13 @@
  */
 `timescale 1ns / 1ps
 
+`include "gpio/gpio.v"
+
 module bdaq53_eth_core(
     input wire RESET_N,
 
     // clocks from PLL clock buffers
-    input wire BUS_CLK, CLK125TX, CLK125TX90, CLK125RX,
+    input wire BUS_CLK,
     input wire PLL_LOCKED,
 
     input wire          BUS_RST,
