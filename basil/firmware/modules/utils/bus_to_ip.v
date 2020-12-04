@@ -29,8 +29,9 @@ module bus_to_ip
 );
 
 wire CS;
-// Explicitly check for BASEADDR == 0 to circumvent Verilator "UNSIGNED" warning
-assign CS = ((BASEADDR == 0 || BUS_ADD >= BASEADDR) && BUS_ADD <= HIGHADDR);
+/* verilator lint_off UNSIGNED */
+assign CS = (BUS_ADD >= BASEADDR && BUS_ADD <= HIGHADDR);
+/* verilator lint_on UNSIGNED */
 
 assign IP_ADD = CS ? BUS_ADD - BASEADDR : {ABUSWIDTH{1'b0}};
 assign IP_RD = CS ? BUS_RD : 1'b0;
