@@ -77,8 +77,8 @@ gpio_sbus #(
 );
 
 initial begin
-    $dumpfile("gpio_sbus1.vcd");
-    $dumpvars(0);
+//    $dumpfile("gpio_sbus.vcd");
+//    $dumpvars(0);
 end
 
 endmodule
